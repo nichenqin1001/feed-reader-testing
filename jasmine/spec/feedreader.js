@@ -39,11 +39,13 @@ $(function () {
          * 编写一个测试遍历 allFeeds 对象里面的所有的源来保证有名字字段而且不是空的。
          */
         it('should each contains a  key and not empty', function () {
-            allFeeds.forEach(function (feed) {
+            var regularExpressionUrl = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+            allFeeds.forEach(function (feed, i) {
                 // 保证有url字段
                 expect(feed.name).toBeDefined();
                 // 保证链接不为空
                 expect(feed.name.length).not.toBe(0);
+                expect(allFeeds[i].url).toMatch(regularExpressionUrl);
             });
         })
     });
@@ -107,22 +109,21 @@ $(function () {
          * 写一个测试保证当用 loadFeed 函数加载一个新源的时候内容会真的改变。
          * 记住，loadFeed() 函数是异步的。
          */
-        var $feedName, $newFeedName
+        var $feed;
+
         beforeEach(function (done) {
             // trigger loadFeed function for the first time
             loadFeed(0, function () {
-                $feedName = $('.header-title').text()
-            });
-            // trigger another loadFeed function and call done function when 
-            loadFeed(1, function () {
-                $newFeedName = $('.header-title').text();
-                done();
+                $feed = $('.feed .entry').html();
+                // trigger another loadFeed function and call done function when 
+                loadFeed(1, done);
             });
         });
 
         it('should change feed context when select a new feed', function () {
+            var $newFeed = $('.feed .entry').html();
             // expect name changed if trigger two times loadFeed
-            expect($newFeedName).not.toEqual($feedName);
+            expect($newFeed).not.toEqual($feed);
         })
     })
 
